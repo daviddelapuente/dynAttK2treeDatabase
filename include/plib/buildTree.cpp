@@ -487,17 +487,17 @@ public:
         //Keep an eye over the sort operation
         switch (type) {
             case 0:
-                nodes.add2(info,attTypeNode);
+                nodes.add2(info,attTypeNode,nodesBlockTreePath);
 		//nodes.modAttributesList(info);
                 break;
             case 1:
-                edges.add2(info,attTypeEdge);
+                edges.add2(info,attTypeEdge,edgesBlockTreePath);
 		//edges.modAttributesList(info);
                 break;
             default:
 		uint8_t * str;
-		str=morton(stoi(info[1]),stoi(info[2]),23);            
-		insertTrie(t, str, 23, 22);
+		str=morton(stoi(info[1]),stoi(info[2]),blockTreePath);
+		insertTrie(t, str, blockTreePath, blockTreePath-1);
                 break;
         }
     }
@@ -529,11 +529,11 @@ public:
         int q1[2] = {id,id}, q2[2], j = 0;
         for (int i = 0; i < esc.size();i+=2) {
             q2[0]= esc[i];q2[1] = esc[i+1];
-	    int pathLength=23;
+	    int pathLength=blockTreePath;
             int left=0;
             int right=pow(2,pathLength)-1;
-	    rangeQuery(t,id,id,esc[i],esc[i+1],23,0,22,left,right,left,right,out);
-            if (!out[0].size())
+	    rangeQuery(t,id,id,esc[i],esc[i+1],blockTreePath,0,blockTreePath-1,left,right,left,right,out);
+            if (!out.size())
                 break;
             j = 0;
 	    for(j=0;j<out.size();j++){
@@ -640,12 +640,12 @@ public:
     }
 
     void printNodeAttribute2(int node, int label){
-	string type =  nodes.getAttribute2(node,label);
+	string type =  nodes.getAttribute2(node,label,nodesBlockTreePath);
 	std::cout << type << "\n";
     }
 
     string getNodeAttribute2(int node, int label){
-	return nodes.getAttribute2(node,label);
+	return nodes.getAttribute2(node,label,nodesBlockTreePath);
     }
 
     void printEdgeAttribute(int node, int label){
@@ -658,12 +658,12 @@ public:
     }
 
     void printEdgeAttribute2(int node, int label){
-	string type =  edges.getAttribute2(node,label);
+	string type =  edges.getAttribute2(node,label,edgesBlockTreePath);
 	std::cout << type << "\n";
     }
 
     string getEdgeAttribute2(int node, int label){
-	return edges.getAttribute2(node,label);
+	return edges.getAttribute2(node,label,edgesBlockTreePath);
     }
 
 
@@ -679,14 +679,14 @@ public:
     } 
 
     void printNodeAttributeValue2(string type, int att,string value){
-	std::vector<int> result = nodes.selectNodeAttVal2(type,att,value);
+	std::vector<int> result = nodes.selectNodeAttVal2(type,att,value,nodesBlockTreePath);
 	for (int i=0;i<result.size();i++){
 		std::cout << result[i] << "\n";
 	}
     } 
 
     std::vector<int> getNodeAttributeValue2(string type, int att,string value){
-	return nodes.selectNodeAttVal2(type,att,value);
+	return nodes.selectNodeAttVal2(type,att,value,nodesBlockTreePath);
     } 
 
     void printEdgeAttributeValue(string type, int att,string value){
@@ -701,14 +701,14 @@ public:
     } 
 
     void printEdgeAttributeValue2(string type, int att,string value){
-	std::vector<int> result = edges.selectNodeAttVal2(type,att,value);
+	std::vector<int> result = edges.selectNodeAttVal2(type,att,value,edgesBlockTreePath);
 	for (int i=0;i<result.size();i++){
 		std::cout << result[i] << "\n";
 	}
     } 
 
     std::vector<int> getEdgeAttributeValue2(string type, int att,string value){
-	return edges.selectNodeAttVal2(type,att,value);
+	return edges.selectNodeAttVal2(type,att,value,edgesBlockTreePath);
     } 
 
     void printNeighbourNodes(string type, int id){
@@ -755,6 +755,18 @@ public:
 	return size;
     }
 
+    void setBlockTreePath(int newLength){
+	blockTreePath=newLength;
+    }
+
+    void setNodesBlockTreePath(int newLength){
+	nodesBlockTreePath=newLength;
+    }
+
+    void setEdgesBlockTreePath(int newLength){
+	edgesBlockTreePath=newLength;
+    }
+
 
 private:
     void _constructFromFile(char * baseName){
@@ -792,4 +804,7 @@ private:
 
     TreeDyn k2Tree = TreeDyn(k, true);
     std::vector<int> attTypeNode,attTypeEdge;
+    int blockTreePath=23;
+    int nodesBlockTreePath=23;
+    int edgesBlockTreePath=23;
 };

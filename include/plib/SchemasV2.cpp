@@ -97,12 +97,12 @@ public:
         wtSimbols.push_back(actualType);
     }
 
-    void _addNodeAtts2(vector<string> tokens, int pos){
+    void _addNodeAtts2(vector<string> tokens, int pos,int blockPathLength){
         int size = tokens.size(), att = 0, actualType = nodes[pos].id;
         string  s = "-";
         for (int i = 1; i < size; i++) {
             if ((tokens[i] != s) & (tokens[i] != "")) {
-                nodes[actualType].attributes[att]->addAtt2(tokens[i], wtSimbols.rank(wtSimbols.size(), actualType), 0);
+                nodes[actualType].attributes[att]->addAtt2(tokens[i], wtSimbols.rank(wtSimbols.size(), actualType), 0,blockPathLength);
             }
             att++;
         }
@@ -139,7 +139,7 @@ public:
         return 1;
     }
 
-    int add2(vector<string> info, vector<int> attType){
+    int add2(vector<string> info, vector<int> attType,int blockPathLength){
         if (info.size() == 0)
             return -1;
         int pos = binarySearch(info[0],nodes);
@@ -165,7 +165,7 @@ public:
             for (int i = 0; i < nodes.size(); i++)
                 printf("Labels %s\n",nodes[i].labelName.c_str());
         }
-        _addNodeAtts2(info,pos);
+        _addNodeAtts2(info,pos,blockPathLength);
         return 1;
     }
 
@@ -219,10 +219,10 @@ public:
             return "";
     }
 
-    string getAttribute2(int idNode, int numAtt){
+    string getAttribute2(int idNode, int numAtt,int blockPathLength){
         int pos = binarySearch(getType(idNode), this->nodes);
         if (this->nodes[pos].attributes[numAtt] != NULL){
-	    return this->nodes[pos].attributes[numAtt]->getValue2(wtSimbols.rank(idNode+1,nodes[pos].id)-1);
+	    return this->nodes[pos].attributes[numAtt]->getValue2(wtSimbols.rank(idNode+1,nodes[pos].id)-1,blockPathLength);
         }else
             return "";
     }
@@ -245,14 +245,14 @@ public:
         return nodes;
     }
 
-    std::vector<int> selectNodeAttVal2(string label, int numAtt, string attVal){
+    std::vector<int> selectNodeAttVal2(string label, int numAtt, string attVal,int blockPathLength){
         std::vector<int> nodes;
         int pos = binarySearch(label,this->nodes);
         int vals[2] = {0, this->nodes[pos].numNodes};
         (pos != 0)?vals[0] = this->nodes[pos-1].numNodes+1:0;
         if (this->nodes[pos].attributes[numAtt] == NULL)
             return nodes;
-        std::vector<int> nodesA = this->nodes[pos].attributes[numAtt]->getNodesWithVal2(attVal);
+        std::vector<int> nodesA = this->nodes[pos].attributes[numAtt]->getNodesWithVal2(attVal,blockPathLength);
         for (int i = 0; i < nodesA.size(); i++){
             if (nodesA[i]+vals[0] < vals[1])
                 nodes.push_back(nodesA[i]+vals[0]);

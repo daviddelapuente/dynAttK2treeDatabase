@@ -49,14 +49,14 @@ class Att {
 public:
     Att(){}
     virtual void addAtt(std::string, int, bool){};
-    virtual void addAtt2(std::string, int, bool){};
+    virtual void addAtt2(std::string, int, bool,int){};
     virtual std::string getValue(int){};
-    virtual std::string getValue2(int){};
+    virtual std::string getValue2(int,int){};
     virtual void printFullAttList(){};
     virtual void printFullAttSortedList(){};
     virtual void sortValues(){};
     virtual std::vector<int> getNodesWithVal(string){};
-    virtual std::vector<int> getNodesWithVal2(string){};
+    virtual std::vector<int> getNodesWithVal2(string,int){};
     virtual int getByteUsed(){};
     virtual long long int numBytes(){};
     virtual uint64_t numBytes2(){};
@@ -77,7 +77,7 @@ public:
         attValsSorted.push_back(a);
     }
 
-    void addAtt2(std::string val, int node, bool insert){
+    void addAtt2(std::string val, int node, bool insert,int blockPathLength){
         char *y = new char[val.size()+1];
         strcpy(y,val.c_str());
         attVals.push_back(y);
@@ -106,7 +106,7 @@ public:
         return attVals[pos];
     }
 
-    std::string getValue2(int pos){
+    std::string getValue2(int pos,int blockPathLength){
         return attVals[pos];
     }
 
@@ -136,7 +136,7 @@ public:
         return output;
     }
 
-    std::vector<int> getNodesWithVal2(string attVal){
+    std::vector<int> getNodesWithVal2(string attVal,int blockPathLength){
         std::vector<int> output;
         int pos = binarySearch(attVal,attValsSorted);
 
@@ -241,7 +241,7 @@ public:
         this->tree.insert(0,index);
     }
 
-    void addAtt2(std::string val, int node, bool insert){
+    void addAtt2(std::string val, int node, bool insert,int blockPathLength){
        std::vector<std::string>::iterator it =
                 std::find(diffValues.begin(),diffValues.end(),val);
         int index[2] = {node,it-diffValues.begin()};
@@ -249,8 +249,8 @@ public:
             diffValues.push_back(val);
 
 	uint8_t * str;
-	str=morton(index[0],index[1],23);            
-	insertTrie(this->t, str, 23, 22);
+	str=morton(index[0],index[1],blockPathLength);            
+	insertTrie(this->t, str, blockPathLength, blockPathLength-1);
     }
 
     void printFullAttList(){
@@ -259,13 +259,13 @@ public:
         this->tree.printTL();
     }
 
-    std::string getValue2(int pos){
+    std::string getValue2(int pos,int blockPathLength){
         int r1[2] = {pos,pos}, r2[2] = {0,diffValues.size()-1};
-	int pathLength=23;
+	int pathLength=blockPathLength;
         int left=0;
         int right=pow(2,pathLength)-1;
 	std::vector<std::vector<int>> neighbors;
-	rangeQuery(t,r1[0],r1[1],r2[0],r2[1],23,0,22,left,right,left,right,neighbors);
+	rangeQuery(t,r1[0],r1[1],r2[0],r2[1],blockPathLength,0,blockPathLength-1,left,right,left,right,neighbors);
         return diffValues[neighbors[0][1]];
     }
 
@@ -290,18 +290,18 @@ public:
         return output;
     }
 
-    std::vector<int> getNodesWithVal2(string attVal){
+    std::vector<int> getNodesWithVal2(string attVal,int blockPathLength){
         std::vector<int> output;
         std::vector<std::string>::iterator it = std::find(diffValues.begin(),
                                                           diffValues.end(),attVal);
         if (it == diffValues.end())
             return output;
-	int pathLength=23;
+	int pathLength=blockPathLength;
         int left=0;
         int right=pow(2,pathLength)-1;
 	std::vector<std::vector<int>> answer;
 	int q1[2] = {0,right},q2[2] = {it-diffValues.begin(),it-diffValues.begin()};
-	rangeQuery(t,q1[0],q1[1],q2[0],q2[1],23,0,22,left,right,left,right,answer);
+	rangeQuery(t,q1[0],q1[1],q2[0],q2[1],blockPathLength,0,blockPathLength-1,left,right,left,right,answer);
 	for (int i = 0; i < answer.size(); i++){
 		output.push_back(answer[i][0]);
 	}
