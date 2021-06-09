@@ -55,22 +55,23 @@ int main(int argc, char* argv[]) {
     FILE *fpedgesval;
     FILE *fpedgeslnk;
 
-    fpnodesatt=fopen("../datasets/graph/graph.nodes.att", "r");
-    fpnodestyp=fopen("../datasets/graph/graph.nodes.typ", "r");
-    fpnodesval=fopen("../datasets/graph/graph.nodes.val", "r");
+    fpnodesatt=fopen("../datasets/graph10M/graph.nodes.att", "r");
+    fpnodestyp=fopen("../datasets/graph10M/graph.nodes.typ", "r");
+    fpnodesval=fopen("../datasets/graph10M/graph.nodes.val", "r");
 
-    fpedgesatt=fopen("../datasets/graph/graph.edges.att", "r");
-    fpedgestyp=fopen("../datasets/graph/graph.edges.typ", "r");
-    fpedgesval=fopen("../datasets/graph/graph.edges.val", "r");
-    fpedgeslnk=fopen("../datasets/graph/graph.edges.lnk", "r");
+    fpedgesatt=fopen("../datasets/graph10M/graph.edges.att", "r");
+    fpedgestyp=fopen("../datasets/graph10M/graph.edges.typ", "r");
+    fpedgesval=fopen("../datasets/graph10M/graph.edges.val", "r");
+    fpedgeslnk=fopen("../datasets/graph10M/graph.edges.lnk", "r");
+
 
     FILE *fpsize;
     FILE *fpinsert;
     FILE *fpqueries;
 
-    fpsize=fopen("./resultsml100k2/size.txt", "w");
-    fpinsert=fopen("./resultsml100k2/insertions.txt", "w");
-    fpqueries=fopen("./resultsml100k2/queries.txt", "w");
+    fpsize=fopen("./results10MnoMulty/size.txt", "w");
+    fpinsert=fopen("./results10MnoMulty/insertions.txt", "w");
+    fpqueries=fopen("./results10MnoMulty/queries.txt", "w");
 
     if (fpnodesatt == NULL || fpnodestyp == NULL|| fpnodesval == NULL ||fpedgesatt==NULL||fpedgestyp==NULL||fpedgeslnk==NULL||fpedgesval==NULL  || fpsize==NULL || fpinsert==NULL ||fpqueries==NULL){
         printf("Error opening file!\n");
@@ -78,16 +79,11 @@ int main(int argc, char* argv[]) {
     }
 
 
+
     int scanCode;
 
 
-
-
-
-
-
-
-
+    //nodes att
     int nNodeType,nodeNumAtt;
     scanCode=fscanf(fpnodesatt,"%i\t%i\n", &nNodeType,&nodeNumAtt);
     int aux;
@@ -117,11 +113,13 @@ int main(int argc, char* argv[]) {
 	       
 	}
 	nodeAtt.push_back(auxVector);
-	scanCode=fscanf(fpnodesatt,"\n", &aux); 
+	scanCode=fscanf(fpnodesatt,"\n"); 
     }
 
     fclose(fpnodesatt);
 
+
+    //nodes typ
     std::vector <string> nodeTypes;
     std::vector <int> nodeN;
 
@@ -140,8 +138,7 @@ int main(int argc, char* argv[]) {
 
 
 
-
-
+    //edges att
 
     int nEdgeType,edgeNumAtt;
     scanCode=fscanf(fpedgesatt,"%i\t%i\n", &nEdgeType,&edgeNumAtt);
@@ -171,12 +168,12 @@ int main(int argc, char* argv[]) {
 	       
 	}
 	edgeAtt.push_back(auxVector);
-	scanCode=fscanf(fpedgesatt,"\n", &aux); 
+	scanCode=fscanf(fpedgesatt,"\n"); 
     }
 
     fclose(fpedgesatt);
 
-
+    //edges typ
     std::vector <string> edgeTypes;
     std::vector <int> edgeN;
 
@@ -190,6 +187,23 @@ int main(int argc, char* argv[]) {
 
     fclose(fpedgestyp);
 
+    printIntVector(nodes);    
+    printIntVector(edgesAtt);
+    printf("\n");
+
+    printStringVector(nodeTypes);
+    printIntVector(nodeN);
+    printf("%i\n",nodeNumAtt);
+    printIntMatrix(nodeAtt);
+    printf("\n");
+
+    printStringVector(edgeTypes);
+    printIntVector(edgeN);
+    printf("%i\n",edgeNumAtt);
+    printIntMatrix(edgeAtt);
+    printf("\n");
+
+    
     DynAttK2Tree tree(nodes, edgesAtt,nodeTypes,nodeN,nodeNumAtt,nodeAtt,edgeTypes,edgeN,edgeNumAtt,edgeAtt);
 
 
@@ -200,14 +214,16 @@ int main(int argc, char* argv[]) {
     clock_t start, diff=0;
 
     int lnkid, lnka, lnkb;
-
     for(int i=0;i<edgeN[0]+edgeN[1];i++){
+	if(i%100000==0 && i!=0){
+	    printf("links inserted = %i \n",i);
+	}
 	scanCode=fscanf(fpedgeslnk,"%i\t%i\t%i\n", &lnkid,&lnka,&lnkb);
 	tokens[0]=to_string(lnkid);
 	tokens[1]=to_string(lnka);
 	tokens[2]=to_string(lnkb);
 	start = clock();
-	tree.insert2(2, tokens);
+	tree.insert(2, tokens);
 	diff += clock() - start;
     }
 
@@ -243,7 +259,7 @@ int main(int argc, char* argv[]) {
 	}
 	scanCode=fscanf(fpnodesval,"\n"); 
 	start = clock();
-	tree.insert2(0, tokens2);
+	tree.insert(0, tokens2);
 	diff += clock() - start;
     }
 
@@ -264,7 +280,7 @@ int main(int argc, char* argv[]) {
 
 	scanCode=fscanf(fpnodesval,"\n"); 
 	start = clock();
-	tree.insert2(0, tokens2);
+	tree.insert(0, tokens2);
 	diff += clock() - start;
     }
 
@@ -285,7 +301,7 @@ int main(int argc, char* argv[]) {
 
 	scanCode=fscanf(fpnodesval,"\n"); 
 	start = clock();
-	tree.insert2(0, tokens2);
+	tree.insert(0, tokens2);
 	diff += clock() - start;
     }
 
@@ -295,11 +311,16 @@ int main(int argc, char* argv[]) {
     msec = diff * 1000 / CLOCKS_PER_SEC;
     fprintf(fpinsert,"insert nodes val(ms) = %f \n",(float)msec);
 
+
+
     printf("inserting edges\n");
     std::vector <string> tokens3={edgeTypes[0]};
     diff=0;
-    
+
     for(int i=0;i<edgeN[0];i++){
+	if(i%100000==0 && i!=0){
+	    printf("edges inserted = %i \n",i);
+	}
 	for(int j=0;j<edgeNumAtt+1;j++){
 	    if(j==edgeNumAtt){
 	    	scanCode=fscanf(fpedgesval,"%s\t", auxString);
@@ -321,7 +342,7 @@ int main(int argc, char* argv[]) {
 	}
 	scanCode=fscanf(fpedgesval,"\n"); 
 	start = clock();
-	tree.insert2(1, tokens3);
+	tree.insert(1, tokens3);
 	diff += clock() - start;
     }
 
@@ -342,7 +363,7 @@ int main(int argc, char* argv[]) {
 
 	scanCode=fscanf(fpedgesval,"\n"); 
 	start = clock();
-	tree.insert2(1, tokens3);
+	tree.insert(1, tokens3);
 	diff += clock() - start;
     }
 
@@ -352,88 +373,51 @@ int main(int argc, char* argv[]) {
     msec = diff * 1000 / CLOCKS_PER_SEC;
     fprintf(fpinsert,"insert nodes val(ms) = %f \n",(float)msec);
 
-/*
-
-
-    printf("probando queries:\n");
-    printf("probando querie 1.1) getnodetypes:\n");
-    tree.printNodeTypes();
-    printf("probando querie 1.2) getedgetypes:\n");
-    tree.printEdgeTypes();
-
-    printf("probando querie 2.1) scan node by type:\n");
-    tree.printScanNodes("nodeType0");
-    tree.printScanNodes("nodeType1");
-    tree.printScanNodes("nodeType2");
-
-    printf("probando querie 2.2) scan edge by type:\n");
-    tree.printScanEdges("edgeType0");
-    tree.printScanEdges("edgeType1");
-
-    printf("probando querie 3.1) get node (x):\n");
-
-    
-    tree.printNodeType(0);
-    tree.printNodeType(942);
-    tree.printNodeType(500);
-
-    tree.printNodeType(943);
-    tree.printNodeType(2624);
-    tree.printNodeType(945);
-
-    tree.printNodeType(2625);
-    tree.printNodeType(2643);
-    tree.printNodeType(2630);
-    
-
-    printf("probando querie 3.2) get edge (x):\n");
-
-
-    tree.printEdgeType(0);
-    tree.printEdgeType(99999);
-    tree.printEdgeType(43874);
-
-    tree.printEdgeType(100000);
-    tree.printEdgeType(102892);
-    tree.printEdgeType(101010);
 
 
 
 
-*/
+
+
+
+
+
+
     printf("probando querie 4.1) get nodeatribute (id,label):\n");
 
     diff=0;
-    for(int i=0;i<=942;i++){
+    for(int i=0;i<=71566;i++){
 	start = clock();
-	tree.getNodeAttribute2(i,0);
+	tree.getNodeAttribute(i,0);
 	diff += clock() - start;
     }
     msec = diff * 1000 / CLOCKS_PER_SEC;
     fprintf(fpqueries,"queries 4.1) get node atribute (user,0) (ms) = %f \n",(float)msec);
 
+
+
     diff=0;
-    for(int i=0;i<=942;i++){
+    for(int i=71567;i<=82247;i++){
 	start = clock();
-	tree.getNodeAttribute2(i,1);
+	tree.getNodeAttribute(i,1);
 	diff += clock() - start;
     }
     msec = diff * 1000 / CLOCKS_PER_SEC;
     fprintf(fpqueries,"queries 4.1) get node atribute (user,1) (ms) = %f \n",(float)msec);
 
     diff=0;
-    for(int i=0;i<=942;i++){
+    for(int i=71567;i<=82247;i++){
 	start = clock();
-	tree.getNodeAttribute2(i,2);
+	tree.getNodeAttribute(i,2);
 	diff += clock() - start;
     }
     msec = diff * 1000 / CLOCKS_PER_SEC;
     fprintf(fpqueries,"queries 4.1) get node atribute (user,2) (ms) = %f \n",(float)msec);
 
     diff=0;
-    for(int i=0;i<=942;i++){
+    for(int i=71567;i<=82247;i++){
 	start = clock();
-	tree.getNodeAttribute2(i,3);
+	tree.getNodeAttribute(i,3);
 	diff += clock() - start;
     }
     msec = diff * 1000 / CLOCKS_PER_SEC;
@@ -441,175 +425,117 @@ int main(int argc, char* argv[]) {
 
 
 
-
-
     diff=0;
-    for(int i=943;i<=2624;i++){
+    for(int i=822478;i<=82267;i++){
 	start = clock();
-	tree.getNodeAttribute2(i,4);
+	tree.getNodeAttribute(i,4);
 	diff += clock() - start;
     }
     msec = diff * 1000 / CLOCKS_PER_SEC;
     fprintf(fpqueries,"queries 4.1) get node atribute (movie,4) (ms) = %f \n",(float)msec);
 
-    diff=0;
-    for(int i=943;i<=2624;i++){
-	start = clock();
-	tree.getNodeAttribute2(i,5);
-	diff += clock() - start;
-    }
-    msec = diff * 1000 / CLOCKS_PER_SEC;
-    fprintf(fpqueries,"queries 4.1) get node atribute (movie,5) (ms) = %f \n",(float)msec);
 
-    diff=0;
-    for(int i=943;i<=2624;i++){
-	start = clock();
-	tree.getNodeAttribute2(i,6);
-	diff += clock() - start;
-    }
-    msec = diff * 1000 / CLOCKS_PER_SEC;
-    fprintf(fpqueries,"queries 4.1) get node atribute (movie,6) (ms) = %f \n",(float)msec);
-
-
-
-    diff=0;
-    for(int i=2625;i<=2643;i++){
-	start = clock();
-	tree.getNodeAttribute2(i,7);
-	diff += clock() - start;
-    }
-    msec = diff * 1000 / CLOCKS_PER_SEC;
-    fprintf(fpqueries,"queries 4.1) get node atribute (genre,7) (ms) = %f \n",(float)msec);
 
 
     fprintf(fpqueries,"\n");
 
 
+
+
+
     printf("probando querie 4.2) get edgeatribute (id,label):\n");
 
     diff=0;
-    for(int i=0;i<=99999;i++){
+    for(int i=0;i<=10000053;i++){
+	if(i%2000000==0 && i!=0){
+	    printf("rangequery = %i \n",i);
+	}
 	start = clock();
-	tree.getEdgeAttribute2(i,0);
+	tree.getEdgeAttribute(i,0);
 	diff += clock() - start;
     }
     msec = diff * 1000 / CLOCKS_PER_SEC;
     fprintf(fpqueries,"queries 4.2) get edge atribute (rating,0) (ms) = %f \n",(float)msec);
 
     diff=0;
-    for(int i=0;i<=99999;i++){
+    for(int i=0;i<=10000053;i++){
+	if(i%2000000==0 && i!=0){
+	    printf("rangequery = %i \n",i);
+	}
 	start = clock();
-	tree.getEdgeAttribute2(i,1);
+	tree.getEdgeAttribute(i,1);
 	diff += clock() - start;
     }
     msec = diff * 1000 / CLOCKS_PER_SEC;
     fprintf(fpqueries,"queries 4.2) get edge atribute (rating,1) (ms) = %f \n",(float)msec);
 
+
+
+
+
     fprintf(fpqueries,"\n");
+
+
+
+
 
 
     printf("probando querie 5.1) get node atribute value (type,att,value):\n");
-    
 
     diff=0;
-    start = clock();
-    tree.getNodeAttributeValue2("nodeType0",0,"7");
-    tree.getNodeAttributeValue2("nodeType0",0,"14");
-    tree.getNodeAttributeValue2("nodeType0",0,"25");
-    tree.getNodeAttributeValue2("nodeType0",0,"30");
-    tree.getNodeAttributeValue2("nodeType0",0,"49");
-    tree.getNodeAttributeValue2("nodeType0",0,"50");
-    tree.getNodeAttributeValue2("nodeType0",0,"68");
-    tree.getNodeAttributeValue2("nodeType0",0,"71");
-    tree.getNodeAttributeValue2("nodeType0",0,"86");
-    tree.getNodeAttributeValue2("nodeType0",0,"99");
-    diff += clock() - start;
+    for(int year=1915;year<=2008;year++){
+	start = clock();
+	tree.getNodeAttributeValue("nodeType1",3,std::to_string(year));
+	diff += clock() - start;
+    }
 
     msec = diff * 1000;
-    fprintf(fpqueries,"queries 5.1) get node atribute value (user,0,x) (1000000*ms) = %f \n",(float)msec);
+    fprintf(fpqueries,"queries 5.1) get node atribute value (movie,3,x) (1000000*ms) = %f \n",(float)msec);
 
 
     diff=0;
     start = clock();
-    tree.getNodeAttributeValue2("nodeType0",1,"M");
-    tree.getNodeAttributeValue2("nodeType0",1,"M");
+    tree.getNodeAttributeValue("nodeType2",4,"Action");
+    tree.getNodeAttributeValue("nodeType2",4,"Adventure");
+    tree.getNodeAttributeValue("nodeType2",4,"Animation");
+    tree.getNodeAttributeValue("nodeType2",4,"Children");
+    tree.getNodeAttributeValue("nodeType2",4,"Comedy");
+    tree.getNodeAttributeValue("nodeType2",4,"Crime");
+    tree.getNodeAttributeValue("nodeType2",4,"Documentary");
+    tree.getNodeAttributeValue("nodeType2",4,"Drama");
+    tree.getNodeAttributeValue("nodeType2",4,"Fantasy");
+    tree.getNodeAttributeValue("nodeType2",4,"Film-Noir");
+    tree.getNodeAttributeValue("nodeType2",4,"Horror");
+    tree.getNodeAttributeValue("nodeType2",4,"Musical");
+    tree.getNodeAttributeValue("nodeType2",4,"Mystery");
+    tree.getNodeAttributeValue("nodeType2",4,"Romance");
+    tree.getNodeAttributeValue("nodeType2",4,"Sci-Fi");
+    tree.getNodeAttributeValue("nodeType2",4,"Thriller");
+    tree.getNodeAttributeValue("nodeType2",4,"War");
+    tree.getNodeAttributeValue("nodeType2",4,"Western");
+    tree.getNodeAttributeValue("nodeType2",4,"IMAX");
+    tree.getNodeAttributeValue("nodeType2",4,"(no_genres_listed)");
+
     diff += clock() - start;
 
     msec = diff * 1000;
-    fprintf(fpqueries,"queries 5.1) get node atribute value (user,1,x) (1000000*ms) = %f \n",(float)msec);
+    fprintf(fpqueries,"queries 5.1) get node atribute value (movie,4,x) (1000000*ms) = %f \n",(float)msec);
 
 
 
-
-    diff=0;
-    start = clock();
-    tree.getNodeAttributeValue2("nodeType0",2,"administrator");
-    tree.getNodeAttributeValue2("nodeType0",2,"artist");
-    tree.getNodeAttributeValue2("nodeType0",2,"doctor");
-    tree.getNodeAttributeValue2("nodeType0",2,"educator");
-    tree.getNodeAttributeValue2("nodeType0",2,"engineer");
-    tree.getNodeAttributeValue2("nodeType0",2,"executive");
-    tree.getNodeAttributeValue2("nodeType0",2,"healthcare");
-    tree.getNodeAttributeValue2("nodeType0",2,"homemaker");
-    tree.getNodeAttributeValue2("nodeType0",2,"lawyer");
-    tree.getNodeAttributeValue2("nodeType0",2,"librarian");
-    tree.getNodeAttributeValue2("nodeType0",2,"marketing");
-    tree.getNodeAttributeValue2("nodeType0",2,"none");
-    tree.getNodeAttributeValue2("nodeType0",2,"other");
-    tree.getNodeAttributeValue2("nodeType0",2,"programmer");
-    tree.getNodeAttributeValue2("nodeType0",2,"retired");
-    tree.getNodeAttributeValue2("nodeType0",2,"salesman");
-    tree.getNodeAttributeValue2("nodeType0",2,"scientist");
-    tree.getNodeAttributeValue2("nodeType0",2,"student");
-    tree.getNodeAttributeValue2("nodeType0",2,"technician");
-    tree.getNodeAttributeValue2("nodeType0",2,"writer");
-    diff += clock() - start;
-
-    msec = diff * 1000;
-    fprintf(fpqueries,"queries 5.1) get node atribute value (user,2,x) (1000000*ms) = %f \n",(float)msec);
-
-
-
-
-
-
-    diff=0;
-    start = clock();
-    tree.getNodeAttributeValue2("nodeType2",7,"unknown");
-    tree.getNodeAttributeValue2("nodeType2",7,"Action");
-    tree.getNodeAttributeValue2("nodeType2",7,"Adventure");
-    tree.getNodeAttributeValue2("nodeType2",7,"Animation");
-    tree.getNodeAttributeValue2("nodeType2",7,"Children's");
-    tree.getNodeAttributeValue2("nodeType2",7,"Comedy");
-    tree.getNodeAttributeValue2("nodeType2",7,"Crime");
-    tree.getNodeAttributeValue2("nodeType2",7,"Documentary");
-    tree.getNodeAttributeValue2("nodeType2",7,"Drama");
-    tree.getNodeAttributeValue2("nodeType2",7,"Fantasy");
-    tree.getNodeAttributeValue2("nodeType2",7,"Film-Noir");
-    tree.getNodeAttributeValue2("nodeType2",7,"Horror");
-    tree.getNodeAttributeValue2("nodeType2",7,"Musical");
-    tree.getNodeAttributeValue2("nodeType2",7,"Mystery");
-    tree.getNodeAttributeValue2("nodeType2",7,"Romance");
-    tree.getNodeAttributeValue2("nodeType2",7,"Sci-Fi");
-    tree.getNodeAttributeValue2("nodeType2",7,"Thriller");
-    tree.getNodeAttributeValue2("nodeType2",7,"War");
-    tree.getNodeAttributeValue2("nodeType2",7,"Western");
-    diff += clock() - start;
-
-    msec = diff * 1000;
-    fprintf(fpqueries,"queries 5.1) get node atribute value (movie,7,x) (1000000*ms) = %f \n",(float)msec);
 
     fprintf(fpqueries,"\n");
+
 
     printf("probando querie 5.2) get edge atribute value (type,att,value):\n");
 
     diff=0;
     start = clock();
-    tree.getEdgeAttributeValue2("edgeType0",0,"0");
-    tree.getEdgeAttributeValue2("edgeType0",0,"1");
-    tree.getEdgeAttributeValue2("edgeType0",0,"2");
-    tree.getEdgeAttributeValue2("edgeType0",0,"3");
-    tree.getEdgeAttributeValue2("edgeType0",0,"4");
+    tree.getEdgeAttributeValue("edgeType0",0,"0");
+    tree.getEdgeAttributeValue("edgeType0",0,"1");
+    tree.getEdgeAttributeValue("edgeType0",0,"2");
+    tree.getEdgeAttributeValue("edgeType0",0,"3");
+    tree.getEdgeAttributeValue("edgeType0",0,"4");
     diff += clock() - start;
 
     msec = diff * 1000/ CLOCKS_PER_SEC;
@@ -623,17 +549,27 @@ int main(int argc, char* argv[]) {
     printf("probando querie 6.1) get node neighbours (type,id):\n");
     diff=0;
 
-    for(int i=0;i<=942;i++){
+    for(int i=0;i<=71566;i++){
     	start = clock();
-	tree.getNeighbourNodes2("nodeType1",i);
+	tree.getNeighbourNodes("nodeType1",i);
     	diff += clock() - start;
     }
     
     msec = diff * 1000/ CLOCKS_PER_SEC;
     fprintf(fpqueries,"queries 6.1) get node neighbours (movie,i) (ms) = %f \n",(float)msec);
 
-    fprintf(fpsize,"%i\n",tree.printSize2());
+    
+
+
+    fprintf(fpsize,"%i\n",tree.printSize());
+
+
     fclose(fpinsert);
     fclose(fpsize);
     fclose(fpqueries);
+ 
+
+
+
+
 }

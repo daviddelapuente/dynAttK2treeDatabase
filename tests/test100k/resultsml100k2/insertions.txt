@@ -1,3 +1,3 @@
-insert links(ms) = 535.000000 
-insert nodes val(ms) = 68.000000 
-insert nodes val(ms) = 1839.000000 
+insert links(ms) = 536.000000 
+insert nodes val(ms) = 75.000000 
+insert nodes val(ms) = 1913.000000 

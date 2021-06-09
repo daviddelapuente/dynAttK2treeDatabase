@@ -1,7 +1,7 @@
-#include "../include/plib/tools.cpp"
-#include "../include/plib/buildTree.cpp"
-#include "../include/sequences/read.cpp"
-#include "../include/sequences/kmer.cpp"
+#include "../../include/plib/tools.cpp"
+#include "../../include/plib/buildTree.cpp"
+#include "../../include/sequences/read.cpp"
+#include "../../include/sequences/kmer.cpp"
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
@@ -55,14 +55,14 @@ int main(int argc, char* argv[]) {
     FILE *fpedgesval;
     FILE *fpedgeslnk;
 
-    fpnodesatt=fopen("./datasets/graph/graph.nodes.att", "r");
-    fpnodestyp=fopen("./datasets/graph/graph.nodes.typ", "r");
-    fpnodesval=fopen("./datasets/graph/graph.nodes.val", "r");
+    fpnodesatt=fopen("../datasets/graph/graph.nodes.att", "r");
+    fpnodestyp=fopen("../datasets/graph/graph.nodes.typ", "r");
+    fpnodesval=fopen("../datasets/graph/graph.nodes.val", "r");
 
-    fpedgesatt=fopen("./datasets/graph/graph.edges.att", "r");
-    fpedgestyp=fopen("./datasets/graph/graph.edges.typ", "r");
-    fpedgesval=fopen("./datasets/graph/graph.edges.val", "r");
-    fpedgeslnk=fopen("./datasets/graph/graph.edges.lnk", "r");
+    fpedgesatt=fopen("../datasets/graph/graph.edges.att", "r");
+    fpedgestyp=fopen("../datasets/graph/graph.edges.typ", "r");
+    fpedgesval=fopen("../datasets/graph/graph.edges.val", "r");
+    fpedgeslnk=fopen("../datasets/graph/graph.edges.lnk", "r");
 
 
     FILE *fpsize;

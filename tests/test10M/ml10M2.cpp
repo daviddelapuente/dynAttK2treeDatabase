@@ -576,7 +576,7 @@ int main(int argc, char* argv[]) {
     
 
 
-    fprintf(fpsize,"%i\n",tree.printSize());
+    fprintf(fpsize,"%i\n",tree.printSize2());
 
 
     fclose(fpinsert);

@@ -1,15 +1,15 @@
-queries 4.1) get node atribute (user,0) (ms) = 416.000000 
-queries 4.1) get node atribute (user,1) (ms) = 115.000000 
-queries 4.1) get node atribute (user,2) (ms) = 116.000000 
+queries 4.1) get node atribute (user,0) (ms) = 396.000000 
+queries 4.1) get node atribute (user,1) (ms) = 109.000000 
+queries 4.1) get node atribute (user,2) (ms) = 109.000000 
 queries 4.1) get node atribute (user,3) (ms) = 414.000000 
 queries 4.1) get node atribute (movie,4) (ms) = 0.000000 
 
-queries 4.2) get edge atribute (rating,0) (ms) = 460363.000000 
-queries 4.2) get edge atribute (rating,1) (ms) = 61137.000000 
+queries 4.2) get edge atribute (rating,0) (ms) = 447988.000000 
+queries 4.2) get edge atribute (rating,1) (ms) = 56299.000000 
 
-queries 5.1) get node atribute value (movie,3,x) (1000000*ms) = 355320992.000000 
-queries 5.1) get node atribute value (movie,4,x) (1000000*ms) = 200000.000000 
+queries 5.1) get node atribute value (movie,3,x) (1000000*ms) = 346464992.000000 
+queries 5.1) get node atribute value (movie,4,x) (1000000*ms) = 176000.000000 
 
-queries 5.2) get edge atribute value (rating,0,x) (ms) = 76725.000000 
+queries 5.2) get edge atribute value (rating,0,x) (ms) = 74823.000000 
 
-queries 6.1) get node neighbours (movie,i) (ms) = 5449.000000 
+queries 6.1) get node neighbours (movie,i) (ms) = 410567.000000 

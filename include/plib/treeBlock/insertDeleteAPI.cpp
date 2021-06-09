@@ -158,7 +158,6 @@ bool isEdgeTrie(trieNode *t, uint8_t *str, uint64_t length, uint16_t maxDepth) {
 
 //return the size of the whole trie
 uint64_t sizeTrie(trieNode *t){
-
     //base case: if the pointer is null return 0
     if (!t) {
         return 0;
@@ -1120,7 +1119,7 @@ bool intersectRectangles(int ar1,int ar2, int ac1, int ac2, int br1, int br2, in
 
 void rangeQueryBlock(treeBlock *root, int r1,int r2,int c1,int c2, uint64_t length, uint16_t level, uint16_t maxDepth,int rleft,int rright,int cleft,int cright,treeNode curNode,uint16_t curFlag,std::vector< std::vector<int> > &answer){
 
-    if(r1==r2 && c1==c2 ){
+    if( rleft==rright && cleft==cright && r1==r2 && c1==c2 ){
         std::vector<int> graphNode;
         graphNode.push_back(r1);
         graphNode.push_back(c1);
@@ -1130,7 +1129,6 @@ void rangeQueryBlock(treeBlock *root, int r1,int r2,int c1,int c2, uint64_t leng
 
         int rmid=(rleft+rright)/2;
         int cmid=(cleft+cright)/2;
-
 
         //ask in the first quadrant
         if(intersectRectangles(r1,r2,c1,c2,rleft,rmid,cleft,cmid)){
@@ -1249,6 +1247,7 @@ void rangeQueryBlock(treeBlock *root, int r1,int r2,int c1,int c2, uint64_t leng
 }
 
 void rangeQuery(trieNode *t, int r1,int r2,int c1,int c2, uint64_t length,uint64_t level ,uint16_t maxDepth,int rleft,int rright, int cleft,int cright,std::vector< std::vector<int> > &answer){
+
     if (t==NULL){
         return;
     }else if(t->children[0]==NULL && t->children[1]==NULL && t->children[2]==0 && t->children[3]==0 && t->block==NULL){

@@ -744,13 +744,21 @@ public:
     }*/
 
     int printSize(){
-	int size=k2Tree.numBytes()+edges.numBytesUsed()+nodes.numBytesUsed();
-	printf("total size= %i \n",size);
+	int s1=k2Tree.numBytes();
+	int s2=edges.numBytesUsed();
+	int s3=nodes.numBytesUsed();
+	int size=s1+s2+s3;
+	printf("k2treesize = %i    edgessize = %i    nodessize = %i \n",s1,s2,s3); 
+	printf("total size = %i \n",size);
 	return size;
     }
 
     uint64_t printSize2(){
-	uint64_t size = sizeTrie(t)+edges.numBytesUsed2()+nodes.numBytesUsed2();
+	uint64_t s1=sizeTrie(t);
+	uint64_t s2=edges.numBytesUsed2();
+	uint64_t s3=nodes.numBytesUsed2();
+	uint64_t size = s1+s2+s3;
+	printf("k2treesize = %lu    edgessize = %lu    nodessize = %lu \n",s1,s2,s3); 
 	printf("total size= %lu \n",size);
 	return size;
     }
@@ -802,7 +810,7 @@ private:
     blockGlobalVars *bgv=(blockGlobalVars*) malloc(sizeof(blockGlobalVars));
     trieNode *t = (trieNode *) malloc(sizeof(trieNode));
 
-    TreeDyn k2Tree = TreeDyn(k, true);
+    TreeDyn k2Tree = TreeDyn(k, false);
     std::vector<int> attTypeNode,attTypeEdge;
     int blockTreePath=23;
     int nodesBlockTreePath=23;
